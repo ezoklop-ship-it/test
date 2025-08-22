@@ -15,7 +15,7 @@ client = discord.Client(intents=intents)
 async def on_ready():
     print(f'Logged in as {client.user}')
     
-    CHANNEL_ID = 1346158310235177004  # Replace with your channel ID
+    CHANNEL_ID = 1408470434768224410  # Replace with your channel ID
     
     try:
         # Fetch the channel by ID
