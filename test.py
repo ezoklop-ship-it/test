@@ -14,7 +14,7 @@ async def main():
         print(f'Logged in as {me.name} (ID: {me.id})')
         
         # Example: Replace with the target user's ID (integer) or username (string)
-        TARGET_USER_ID = 3  # Example: Roblox's user ID; use a real one for testing
+        TARGET_USER_ID = 9280630447  # Example: Roblox's user ID; use a real one for testing
         
         # Fetch the target user
         target_user = await client.get_user(TARGET_USER_ID)
