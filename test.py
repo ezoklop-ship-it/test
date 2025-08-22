@@ -1,6 +1,11 @@
 import discord
 import asyncio
 import traceback
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if it exists
+load_dotenv()
 
 class MyClient(discord.Client):
     async def on_ready(self):
@@ -56,4 +61,8 @@ class MyClient(discord.Client):
             await self.close()
 
 client = MyClient(intents=discord.Intents.default())
-client.run("MTQwNzI2OTMzMDEyMjcwNjk0NA.GkvwDJ.gUeezMdR3FpwGfV6-LgifeoRVTggSu5--OgdUA")
+# Retrieve token from environment variable
+TOKEN = os.getenv('DISCORD_TOKEN')
+if not TOKEN:
+    raise ValueError("DISCORD_TOKEN environment variable not set")
+client.run(TOKEN)
