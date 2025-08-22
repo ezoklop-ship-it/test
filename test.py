@@ -1,68 +1,43 @@
 import discord
-import asyncio
-import traceback
 import os
-from dotenv import load_dotenv
 
-# Load environment variables from .env file if it exists
-load_dotenv()
+# Set up the client for a self-bot (using user account)
+client = discord.Client()
 
-class MyClient(discord.Client):
-    async def on_ready(self):
-        print(f"Logged in as {self.user}")
-        channel_ids = [1346158310235177003]
-        friend_channel_id = None
-        periodic_message = "Periodic message"
-        dm_reply = "Automated response"
-        try:
-            for cid in channel_ids:
-                channel = self.get_channel(cid)
-                if channel:
-                    print(f"Sending message to channel {cid}")
-                    await channel.send(periodic_message)
-                else:
-                    print(f"Channel {cid} not found")
-            dms = [ch for ch in self.private_channels if isinstance(ch, discord.DMChannel)]
-            unanswered = []
-            for ch in dms:
-                if ch.last_message_id:
-                    try:
-                        last_msg = await ch.fetch_message(ch.last_message_id)
-                        if last_msg.author != self.user:
-                            unanswered.append((last_msg.created_at, ch))
-                    except Exception as e:
-                        print(f"Error fetching message in DM {ch.id}: {e}")
-            unanswered.sort(key=lambda x: x[0], reverse=True)
-            for _, ch in unanswered[:3]:
-                print(f"Replying to DM {ch.id}")
-                await ch.send(dm_reply)
-            if friend_channel_id:
-                fchannel = self.get_channel(friend_channel_id)
-                if fchannel:
-                    if fchannel.last_message_id:
-                        try:
-                            last_msg = await fchannel.fetch_message(fchannel.last_message_id)
-                            user = last_msg.author
-                            if user != self.user:
-                                print(f"Sending friend request to {user}")
-                                await self.http.request(discord.http.Route('PUT', f'/users/@me/relationships/{user.id}'), json={})
-                        except Exception as e:
-                            print(f"Error sending friend request: {e}")
-                            traceback.print_exc()
-                    else:
-                        print(f"No last message in channel {friend_channel_id}")
-                else:
-                    print(f"Friend channel {friend_channel_id} not found")
-        except Exception as e:
-            print(f"Unexpected error: {e}")
-            traceback.print_exc()
-        finally:
-            print("Closing client")
-            await self.close()
+# Event: When the self-bot is ready
+@client.event
+async def on_ready():
+    print(f'Logged in as {client.user}')
+    
+    # Replace CHANNEL_ID with the target channel's ID (integer)
+    CHANNEL_ID = 1346158310235177003  # Example: Replace with your channel ID
+    
+    try:
+        # Fetch the channel by ID
+        channel = client.get_channel(CHANNEL_ID)
+        if channel is None:
+            print(f'Error: Channel with ID {CHANNEL_ID} not found or inaccessible.')
+            return
+        
+        # Send the message
+        await channel.send('test')
+        print(f'Sent "test" to channel {channel.name}')
+        
+        # Close the client after sending to avoid staying connected
+        await client.close()
+    except Exception as e:
+        print(f'Error sending message: {e}')
 
-client = MyClient(intents=discord.Intents.default())
-# Retrieve token from environment variable
+# Retrieve token from Codespace secret (environment variable)
 TOKEN = os.getenv('DISCORD_TOKEN')
-if not TOKEN:
-    raise ValueError("DISCORD_TOKEN environment variable not set")
-client.run(TOKEN)
+
+if TOKEN is None:
+    print('Error: DISCORD_TOKEN not found in environment variables.')
+else:
+    try:
+        # Run the self-bot with bot=False to indicate user account
+        client.run(TOKEN, bot=False)
+    except discord.errors.LoginFailure:
+        print('Error: Invalid token provided.')
+    except Exception as e:
+        print(f'Error starting self-bot: {e}')
