@@ -10,7 +10,7 @@ async def on_ready():
     print(f'Logged in as {client.user}')
     
     # Replace CHANNEL_ID with the target channel's ID (integer)
-    CHANNEL_ID = 1346158310235177003  # Example: Replace with your channel ID
+    CHANNEL_ID = 123456789012345678  # Example: Replace with your channel ID
     
     try:
         # Fetch the channel by ID
@@ -35,8 +35,8 @@ if TOKEN is None:
     print('Error: DISCORD_TOKEN not found in environment variables.')
 else:
     try:
-        # Run the self-bot with bot=False to indicate user account
-        client.run(TOKEN, bot=False)
+        # Run the self-bot (no 'bot' parameter)
+        client.run(TOKEN)
     except discord.errors.LoginFailure:
         print('Error: Invalid token provided.')
     except Exception as e:
