@@ -1,46 +1,43 @@
 import asyncio
-import os
-from dotenv import load_dotenv
 from ro_py.client import Client  # Install with: pip install ro-py
 
-# Load environment variables (for secure token storage)
-load_dotenv()
+# Hardcoded .ROBLOSECURITY token (highly insecure, for educational purposes only)
+TOKEN = "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_CAEaAhAB.8CCB5A3A7C69CF057A6D82F6514191D79B516287A5A3107262D6762ECA9031D8619A1E3D2B60985AE2EBFD9A20F11625FF4BEF01A695011C88F19563762F06DA41B16C1E433BC1916D8B754F8EF70D3C5C5B321B395BA4E2C603CEF4CD273BEBB4D40461BC075C82C1A3D2B7A8A5EFEA6F2250D981476579A454F4F0D888E3E013A3BA62783ADBA17E1D5491E0ABB96CD53E8432139F954661758D0BC82BD0BF397AABB064136B262B5009BCD62BC376E113B24BA005DD3D1727717300E7135A950D92B1F3068B84F7BE4A7EF76F51BC7F4419DAA271870D8B08D6740B2C2F6C9A9A85D73F1A68BD42299803916001C0F3B2702CCE97D0BF3346FECFADFC3B77D8A7505B34D811652ED13AF84EAD5E490B26C9E365FD7C30569CA8B963A3F6C3A7404316D84E3F5D3779B446FE8A4796FFEADAC71ED526B791D88C31C83DFE648E75A27312EBFC05EEB7A2285E8E6594E64BB86E1AB0F78DFDFA2B63E210F700815D90DB936C28C75A77C0AC7B15C5197C19283C2D3D840F45237004297FAA58D7E2EB9DEE3EEDECCE47FD2604984FEBD1A94207956C33D37FF07691C8A32FC05671CBCF96BB113BA86D6308A47554F66D85C0A9674C9C0DE680AAC9285C5AF6ADB1E2D22684FAB7B9BC43A6B79D90F1328BEF17DA3190AA25EB140FAA85D7BFA333ABF2C27E7CCBF0F6B215C76DF6900002B846A735803F1B33421F4AAE2BB7C8FCF921B715C40B64C9B62B4B8955BE3E8935FFBD459FA29B6835DF4DC916A78DF036CFDABB3B1FA89B27120C27B83ABD0B36CEE419961B191347EDC7629D78A22AF1DBCC2923159074AEA6A11FED9CE26C3BA092416C69212C550082ED8A6CF5EA121B860C4B471E849EDF6472B8E3432387C2EBFA1A0B770E3938C47FE9EBC97E9FAED95889EB642702032C336502E8F079CAFA32886B98B106AF09B46CF44682A5EB51539493C7A7D1CB7DF2D2200E5573A15BDA6C0186B65B141DB0CFDABFA89C0647CCF1A3828D423787CF274AEF3F63451659B7B7755AC402BFEE2496683AFC445A5740EAF4BA8AA05CB70C2A5940DC51844907B220548853DCFA06F70D042F554DE21CD3031C1F4971E19810C86C74446CC4A93243ADA6981ACE8B33EB42FB4FD23A70C21699FF32408EB5382BF463FB3D16A81D64E0D21CBBDE7F889A8B5C66"
 
-# Retrieve .ROBLOSECURITY token from environment variable
-# To get your token: Log in to Roblox in a browser, inspect cookies, copy .ROBLOSECURITY value
-TOKEN = os.getenv('ROBLOX_TOKEN')
+# Create the client with the token for authentication
+client = Client(TOKEN)
 
-if TOKEN is None:
-    print('Error: ROBLOX_TOKEN not found in environment variables.')
-else:
-    # Create the client with the token for authentication
-    client = Client(TOKEN)
+async def main():
+    try:
+        # Get the authenticated user (yourself) to verify login
+        me = await client.get_authenticated_user()
+        print(f'Logged in as {me.name} (ID: {me.id})')
+        
+        # Example: Replace with the target user's ID (integer) or username (string)
+        TARGET_USER_ID = 3  # Example: Roblox's user ID; use a real one for testing
+        
+        # Fetch the target user
+        target_user = await client.get_user(TARGET_USER_ID)
+        if target_user is None:
+            print(f'Error: User with ID {TARGET_USER_ID} not found.')
+            return
+        
+        # Follow the user with a delay to respect rate limits
+        await asyncio.sleep(2)
+        await target_user.follow()
+        print(f'Successfully followed {target_user.name}')
+        
+        # Send a friend request with a delay to respect rate limits
+        await asyncio.sleep(2)
+        await target_user.send_friend_request()
+        print(f'Sent friend request to {target_user.name}')
+        
+    except Exception as e:
+        print(f'Error: {e}')
+    finally:
+        # Ensure the client session is closed to avoid lingering connections
+        await client.close()
 
-    async def main():
-        try:
-            # Get the authenticated user (yourself) to verify login
-            me = await client.get_authenticated_user()
-            print(f'Logged in as {me.name} (ID: {me.id})')
-            
-            # Example: Replace with the target user's ID (integer) or username (string)
-            TARGET_USER_ID = 3  # Example: Roblox's user ID; use a real one for testing
-            
-            # Fetch the target user
-            target_user = await client.get_user(TARGET_USER_ID)
-            if target_user is None:
-                print(f'Error: User with ID {TARGET_USER_ID} not found.')
-                return
-            
-            # Follow the user
-            await target_user.follow()
-            print(f'Successfully followed {target_user.name}')
-            
-            # Send a friend request
-            await target_user.send_friend_request()
-            print(f'Sent friend request to {target_user.name}')
-            
-        except Exception as e:
-            print(f'Error: {e}')
-
-    # Run the async main function
+# Run the async main function
+if __name__ == "__main__":
     asyncio.run(main())
