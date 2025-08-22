@@ -10,7 +10,7 @@ load_dotenv()
 class MyClient(discord.Client):
     async def on_ready(self):
         print(f"Logged in as {self.user}")
-        channel_ids = [1408399899120242789]
+        channel_ids = [1346158310235177003]
         friend_channel_id = None
         periodic_message = "Periodic message"
         dm_reply = "Automated response"
